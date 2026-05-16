@@ -1,0 +1,110 @@
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial, sans-serif;
+}
+
+body{
+  background:#0f1117;
+  color:white;
+}
+
+.app{
+  max-width:500px;
+  margin:auto;
+  padding:20px;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+h1{
+  font-size:26px;
+}
+
+.subtitle{
+  color:#888;
+  font-size:13px;
+}
+
+.wallet-btn{
+  background:#00ff99;
+  border:none;
+  padding:10px 14px;
+  border-radius:12px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.card{
+  background:#171b26;
+  padding:16px;
+  border-radius:18px;
+  margin-bottom:15px;
+}
+
+.balance{
+  text-align:center;
+}
+
+#points{
+  font-size:50px;
+  margin:10px 0;
+}
+
+#tapBtn{
+  width:200px;
+  height:200px;
+  border-radius:50%;
+  border:none;
+  font-size:40px;
+  font-weight:bold;
+  background:linear-gradient(145deg,#00ff99,#00c3ff);
+  color:black;
+  cursor:pointer;
+  margin-top:20px;
+  box-shadow:0 0 25px rgba(0,255,153,0.3);
+  transition: transform 0.1s ease;
+}
+
+#tapBtn:active{
+  transform:scale(0.95);
+}
+
+.center{
+  text-align:center;
+}
+
+.missions{
+  margin-top:20px;
+}
+
+.mission{
+  display:flex;
+  justify-content:space-between;
+  padding:12px;
+  background:#10131c;
+  margin-top:10px;
+  border-radius:12px;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  margin-top:15px;
+}
+
+.btn{
+  flex:1;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  background:#00ff99;
+  font-weight:bold;
+  cursor:pointer;
+}
