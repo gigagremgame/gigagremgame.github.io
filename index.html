@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+
+<title>PEPEVOLT BOT</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+
+<style>
+
+/* =========================
+   GLOBAL
+========================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+    user-select:none;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:'Inter',sans-serif;
+    background:#000814;
+    color:#fff;
+}
+
+/* =========================
+   BACKGROUND
+========================= */
+
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+
+    background:
+        radial-gradient(circle at top,
+        rgba(0,255,170,0.08),
+        transparent 40%),
+
+        radial-gradient(circle at bottom,
+        rgba(0,140,255,0.08),
+        transparent 35%);
+
+    z-index:0;
+}
+
+/* =========================
+   APP
+========================= */
+
+.app{
+    position:relative;
+    z-index:2;
+
+    width:100%;
+    height:100vh;
+
+    display:flex;
+    flex-direction:column;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.header{
+
+    padding:18px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,0.05),
+            rgba(255,255,255,0.02)
+        );
+
+    border-bottom:
+        1px solid rgba(255,255,255,0.06);
+
+    backdrop-filter:blur(12px);
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+}
+
+.header-title{
+    font-size:2rem;
+    font-weight:800;
+}
+
+.header-sub{
+    color:#8f98a8;
+    font-size:1rem;
+}
+
+/* =========================
+   STATS BAR
+========================= */
+
+.stats{
+
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+
+    padding:18px 14px;
+
+    background:#021226;
+
+    border-bottom:
+        1px solid rgba(255,255,255,0.04);
+}
+
+.stat{
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+
+    font-weight:700;
+    font-size:1.05rem;
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.main{
+
+    flex:1;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    padding:20px;
+    gap:28px;
+}
+
+/* =========================
+   TAP BUTTON
+========================= */
+
+.tap-area{
+    position:relative;
+}
+
+.tap-glow{
+
+    position:absolute;
+
+    width:290px;
+    height:290px;
+
+    background:
+        radial-gradient(circle,
+        rgba(0,255,200,0.28),
+        transparent 70%);
+
+    border-radius:50%;
+
+    top:50%;
+    left:50%;
+
+    transform:
+        translate(-50%,-50%);
+
+    animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+
+    0%{
+        transform:
+        translate(-50%,-50%)
+        scale(.9);
+
+        opacity:.5;
+    }
+
+    50%{
+        transform:
+        translate(-50%,-50%)
+        scale(1.05);
+
+        opacity:1;
+    }
+
+    100%{
+        transform:
+        translate(-50%,-50%)
+        scale(.9);
+
+        opacity:.5;
+    }
+}
+
+.tap-btn{
+
+    position:relative;
+
+    width:230px;
+    height:230px;
+
+    border:none;
+    border-radius:50%;
+
+    overflow:hidden;
+
+    background:
+        linear-gradient(
+            145deg,
+            #00ffbf,
+            #00b7ff
+        );
+
+    box-shadow:
+        0 0 50px rgba(0,255,170,0.25);
+
+    cursor:pointer;
+
+    transition:.12s;
+}
+
+.tap-btn:active{
+    transform:scale(.96);
+}
+
+.tap-btn img{
+
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+}
+
+/* =========================
+   ENERGY BAR
+========================= */
+
+.energy-wrap{
+
+    width:100%;
+    max-width:500px;
+}
+
+.energy-top{
+
+    display:flex;
+    justify-content:space-between;
+
+    margin-bottom:10px;
+
+    color:#9ea7b7;
+    font-size:.92rem;
+}
+
+.energy-bar{
+
+    width:100%;
+    height:18px;
+
+    border-radius:999px;
+
+    overflow:hidden;
+
+    background:
+        rgba(255,255,255,0.08);
+
+    border:
+        1px solid rgba(255,255,255,0.04);
+}
+
+.energy-fill{
+
+    width:0%;
+    height:100%;
+
+    border-radius:999px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #00ff95,
+            #00d9ff
+        );
+
+    transition:.3s;
+}
+
+/* =========================
+   TREASURY CARDS
+========================= */
+
+.cards{
+
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap:14px;
+}
+
+.card{
+
+    background:
+        rgba(255,255,255,0.05);
+
+    border:
+        1px solid rgba(255,255,255,0.06);
+
+    border-radius:22px;
+
+    padding:18px;
+
+    backdrop-filter:blur(10px);
+}
+
+.card-title{
+
+    color:#8f98a8;
+
+    margin-bottom:10px;
+
+    font-size:.82rem;
+}
+
+.card-value{
+
+    font-size:1.2rem;
+    font-weight:800;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.buttons{
+
+    width:100%;
+
+    display:flex;
+    flex-direction:column;
+
+    gap:14px;
+}
+
+.action-btn{
+
+    border:none;
+
+    padding:18px;
+
+    border-radius:18px;
+
+    color:#fff;
+
+    font-size:1rem;
+    font-weight:700;
+
+    cursor:pointer;
+}
+
+.wallet-btn{
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #3b82f6
+        );
+}
+
+.buy-btn{
+    background:
+        linear-gradient(
+            135deg,
+            #00c853,
+            #00e676
+        );
+
+    color:#001b0d;
+}
+
+.convert-btn{
+    background:
+        linear-gradient(
+            135deg,
+            #7c3aed,
+            #9333ea
+        );
+}
+
+.claim-btn{
+    background:
+        linear-gradient(
+            135deg,
+            #ff9800,
+            #ff5722
+        );
+}
+
+button:disabled{
+    opacity:.45;
+    filter:grayscale(1);
+}
+
+/* =========================
+   WALLET MODAL
+========================= */
+
+.wallet-modal{
+
+    position:fixed;
+    inset:0;
+
+    background:
+        rgba(0,0,0,.72);
+
+    backdrop-filter:blur(10px);
+
+    z-index:9999;
+
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+
+    transition:.3s;
+}
+
+.hidden{
+    opacity:0;
+    pointer-events:none;
+}
+
+.wallet-sheet{
+
+    width:100%;
+    max-width:520px;
+
+    background:#111315;
+
+    border-radius:34px 34px 0 0;
+
+    padding:24px;
+
+    animation:slideUp .3s ease;
+}
+
+@keyframes slideUp{
+
+    from{
+        transform:translateY(100%);
+    }
+
+    to{
+        transform:translateY(0);
+    }
+}
+
+.wallet-top{
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    margin-bottom:24px;
+}
+
+.wallet-title{
+
+    font-size:1.5rem;
+    font-weight:700;
+}
+
+.wallet-close{
+
+    background:none;
+    border:none;
+
+    color:#fff;
+
+    font-size:1.5rem;
+}
+
+.wallet-tabs{
+
+    display:flex;
+
+    background:#1d2027;
+
+    border-radius:999px;
+
+    padding:5px;
+
+    gap:5px;
+
+    margin-bottom:30px;
+}
+
+.wallet-tab{
+
+    flex:1;
+
+    text-align:center;
+
+    padding:12px;
+
+    border-radius:999px;
+
+    color:#8f98a8;
+
+    font-weight:600;
+}
+
+.wallet-tab.active{
+
+    background:#2a2f38;
+
+    color:#fff;
+}
+
+.wallet-body{
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+}
+
+.wallet-logo{
+
+    width:110px;
+    height:110px;
+
+    border-radius:28px;
+
+    background:#000;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:3rem;
+
+    margin-bottom:28px;
+}
+
+.wallet-heading{
+
+    font-size:1.8rem;
+    font-weight:700;
+
+    margin-bottom:12px;
+}
+
+.wallet-sub{
+
+    color:#8f98a8;
+
+    margin-bottom:28px;
+}
+
+.wallet-connect{
+
+    width:100%;
+
+    border:none;
+
+    padding:18px;
+
+    border-radius:18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #3b82f6
+        );
+
+    color:#fff;
+
+    font-size:1rem;
+    font-weight:700;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:480px){
+
+    .header-title{
+        font-size:1.6rem;
+    }
+
+    .tap-btn{
+        width:180px;
+        height:180px;
+    }
+
+    .tap-glow{
+        width:220px;
+        height:220px;
+    }
+
+    .cards{
+        grid-template-columns:1fr;
+    }
+
+    .action-btn{
+        padding:15px;
+        font-size:.92rem;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- HEADER -->
+    <div class="header">
+
+        <div class="header-title">
+            PEPEVOLT BOT
+        </div>
+
+        <div class="header-sub">
+            mini app
+        </div>
+
+    </div>
+
+    <!-- STATS -->
+    <div class="stats">
+
+        <div class="stat">
+            🔋
+            <span id="energy-display">0</span>
+        </div>
+
+        <div class="stat">
+            ⚡
+            <span id="points-display">0</span>
+        </div>
+
+        <div class="stat">
+            💎
+            <span id="gpvlt-display">0.0000</span>
+        </div>
+
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+
+        <!-- TAP -->
+        <div class="tap-area">
+
+            <div class="tap-glow"></div>
+
+            <button
+            id="tap-button"
+            class="tap-btn"
+            disabled>
+
+                <img src="https://i.imgur.com/TM5QFQx.png">
+
+            </button>
+
+        </div>
+
+        <!-- ENERGY -->
+        <div class="energy-wrap">
+
+            <div class="energy-top">
+
+                <span>
+                    ENERGY
+                </span>
+
+                <span id="energy-percent">
+                    0%
+                </span>
+
+            </div>
+
+            <div class="energy-bar">
+
+                <div
+                id="energy-fill"
+                class="energy-fill">
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- TREASURY -->
+        <div class="cards">
+
+            <div class="card">
+
+                <div class="card-title">
+                    🏦 Treasury
+                </div>
+
+                <div
+                id="treasury-balance"
+                class="card-value">
+                    0
+                </div>
+
+            </div>
+
+            <div class="card">
+
+                <div class="card-title">
+                    🔥 Burned
+                </div>
+
+                <div
+                id="burned-total"
+                class="card-value">
+                    0
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- BUTTONS -->
+        <div class="buttons">
+
+            <button
+            class="action-btn wallet-btn"
+            onclick="openWalletModal()">
+
+                Connect Wallet
+
+            </button>
+
+            <button
+            id="buy-btn"
+            class="action-btn buy-btn"
+            onclick="buyEnergy()"
+            disabled>
+
+                Buy 10,000 Energy • 100 PVLT
+
+            </button>
+
+            <button
+            id="convert-btn"
+            class="action-btn convert-btn"
+            onclick="convertPoints()"
+            disabled>
+
+                Convert Points
+
+            </button>
+
+            <button
+            id="claim-btn"
+            class="action-btn claim-btn"
+            onclick="claimRewards()"
+            disabled>
+
+                Claim Rewards
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- WALLET MODAL -->
+
+<div
+id="wallet-modal"
+class="wallet-modal hidden">
+
+    <div class="wallet-sheet">
+
+        <div class="wallet-top">
+
+            <div class="wallet-title">
+                Binance Wallet
+            </div>
+
+            <button
+            class="wallet-close"
+            onclick="closeWalletModal()">
+
+                ✕
+
+            </button>
+
+        </div>
+
+        <div class="wallet-tabs">
+
+            <div class="wallet-tab active">
+                Mobile
+            </div>
+
+            <div class="wallet-tab">
+                Webapp
+            </div>
+
+            <div class="wallet-tab">
+                Browser
+            </div>
+
+        </div>
+
+        <div class="wallet-body">
+
+            <div class="wallet-logo">
+                🟡
+            </div>
+
+            <div class="wallet-heading">
+                Continue in Binance Wallet
+            </div>
+
+            <div class="wallet-sub">
+                Accept connection request in wallet
+            </div>
+
+            <button
+            class="wallet-connect"
+            onclick="connectWallet()">
+
+                Connect Wallet
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+/* =========================
+   CONTRACTS
+========================= */
+
+const PVLT_ADDRESS =
+"YOUR_PVLT_ADDRESS";
+
+const TREASURY_ADDRESS =
+"YOUR_TREASURY_ADDRESS";
+
+const GAME_ADDRESS =
+"YOUR_GAME_ADDRESS";
+
+/* =========================
+   ABI
+========================= */
+
+const GAME_ABI = [
+
+"function tap() external",
+
+"function buyEnergy() external",
+
+"function convertPoints() external",
+
+"function claimRewards() external",
+
+"function refillEnergy() external",
+
+"function getPlayer(address user) view returns(uint256,uint256,uint256,bool,uint256)"
+];
+
+const TREASURY_ABI = [
+
+"function treasuryBalance() view returns(uint256)",
+
+"function totalBurnedGPVLT() view returns(uint256)"
+];
+
+/* =========================
+   WEB3
+========================= */
+
+let provider;
+let signer;
+let userAddress;
+
+let gameContract;
+let treasuryContract;
+
+let energy = 0;
+let points = 0;
+let burned = 0;
+let paidUser = false;
+
+const FREE_CAP = 50;
+const PAID_CAP = 10000;
+
+/* =========================
+   WALLET MODAL
+========================= */
+
+function openWalletModal(){
+
+    document
+    .getElementById('wallet-modal')
+    .classList.remove('hidden');
+}
+
+function closeWalletModal(){
+
+    document
+    .getElementById('wallet-modal')
+    .classList.add('hidden');
+}
+
+/* =========================
+   CONNECT WALLET
+========================= */
+
+async function connectWallet(){
+
+    try{
+
+        if(!window.ethereum){
+
+            alert(
+                "Install MetaMask or Binance Wallet"
+            );
+
+            return;
+        }
+
+        provider =
+            new ethers.providers.Web3Provider(
+                window.ethereum
+            );
+
+        await provider.send(
+            "eth_requestAccounts",
+            []
+        );
+
+        signer = provider.getSigner();
+
+        userAddress =
+            await signer.getAddress();
+
+        gameContract =
+            new ethers.Contract(
+                GAME_ADDRESS,
+                GAME_ABI,
+                signer
+            );
+
+        treasuryContract =
+            new ethers.Contract(
+                TREASURY_ADDRESS,
+                TREASURY_ABI,
+                signer
+            );
+
+        document
+        .getElementById('tap-button')
+        .disabled = false;
+
+        document
+        .getElementById('buy-btn')
+        .disabled = false;
+
+        document
+        .getElementById('convert-btn')
+        .disabled = false;
+
+        document
+        .getElementById('claim-btn')
+        .disabled = false;
+
+        closeWalletModal();
+
+        loadPlayer();
+
+        loadTreasury();
+
+    } catch(err){
+
+        alert(err.message);
+    }
+}
+
+/* =========================
+   LOAD PLAYER
+========================= */
+
+async function loadPlayer(){
+
+    const data =
+        await gameContract.getPlayer(
+            userAddress
+        );
+
+    energy = Number(data[0]);
+
+    points = Number(data[1]);
+
+    burned = Number(data[2]);
+
+    paidUser = data[3];
+
+    updateUI();
+}
+
+/* =========================
+   LOAD TREASURY
+========================= */
+
+async function loadTreasury(){
+
+    const balance =
+        await treasuryContract
+        .treasuryBalance();
+
+    const burnedTotal =
+        await treasuryContract
+        .totalBurnedGPVLT();
+
+    document
+    .getElementById(
+        'treasury-balance'
+    ).innerText =
+        ethers.utils.formatEther(balance);
+
+    document
+    .getElementById(
+        'burned-total'
+    ).innerText =
+        burnedTotal.toString();
+}
+
+/* =========================
+   UPDATE UI
+========================= */
+
+function updateUI(){
+
+    document
+    .getElementById(
+        'energy-display'
+    ).innerText = energy;
+
+    document
+    .getElementById(
+        'points-display'
+    ).innerText = points;
+
+    document
+    .getElementById(
+        'gpvlt-display'
+    ).innerText = burned;
+
+    const cap =
+        paidUser
+        ? PAID_CAP
+        : FREE_CAP;
+
+    const percent =
+        (energy / cap) * 100;
+
+    document
+    .getElementById(
+        'energy-fill'
+    ).style.width =
+        percent + "%";
+
+    document
+    .getElementById(
+        'energy-percent'
+    ).innerText =
+        Math.floor(percent) + "%";
+}
+
+/* =========================
+   TAP
+========================= */
+
+document
+.getElementById('tap-button')
+.addEventListener(
+'click',
+async () => {
+
+    try{
+
+        const tx =
+            await gameContract.tap();
+
+        await tx.wait();
+
+        loadPlayer();
+
+    } catch(err){
+
+        alert(err.message);
+    }
+});
+
+/* =========================
+   BUY ENERGY
+========================= */
+
+async function buyEnergy(){
+
+    try{
+
+        const tx =
+            await gameContract.buyEnergy();
+
+        await tx.wait();
+
+        loadPlayer();
+
+        loadTreasury();
+
+    } catch(err){
+
+        alert(err.message);
+    }
+}
+
+/* =========================
+   CONVERT
+========================= */
+
+async function convertPoints(){
+
+    try{
+
+        const tx =
+            await gameContract
+            .convertPoints();
+
+        await tx.wait();
+
+        loadPlayer();
+
+        loadTreasury();
+
+    } catch(err){
+
+        alert(err.message);
+    }
+}
+
+/* =========================
+   CLAIM
+========================= */
+
+async function claimRewards(){
+
+    try{
+
+        const tx =
+            await gameContract
+            .claimRewards();
+
+        await tx.wait();
+
+        loadPlayer();
+
+        loadTreasury();
+
+    } catch(err){
+
+        alert(err.message);
+    }
+}
+
+/* =========================
+   AUTO REFILL
+========================= */
+
+setInterval(async () => {
+
+    try{
+
+        if(gameContract){
+
+            await gameContract
+            .refillEnergy();
+
+            loadPlayer();
+        }
+
+    } catch(e){}
+
+},1000);
+
+</script>
+
+</body>
+</html>
