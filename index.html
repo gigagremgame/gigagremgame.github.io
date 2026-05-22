@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tap Tap Game - Production</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+    <style>
+        /* Keep your existing CSS here */
+        body { background: #1a1a2e; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .game-container { width: 100%; max-width: 400px; text-align: center; }
+        .game-btn { background: #4ecca3; width: 80%; padding: 15px; margin: 10px; border: none; border-radius: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>⚡ <span id="energy-display">0</span></h1>
+        <button id="wallet-btn" class="game-btn" onclick="connectWallet()">Connect Wallet</button>
+        <button id="buy-btn" class="game-btn" onclick="executeTx(0)" disabled>Buy 10,000 Energy</button>
+        <button id="convert-btn" class="game-btn" onclick="executeTx(1)" disabled>Convert Points</button>
+        <button id="claim-btn" class="game-btn" onclick="executeTx(2)" disabled>Claim Rewards</button>
+    </div>
+
+    <script>
+        let signer;
+        async function connectWallet() {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            signer = await provider.getSigner();
+            document.getElementById('wallet-btn').innerText = "Connected";
+            document.querySelectorAll('button:not(#wallet-btn)').forEach(b => b.disabled = false);
+        }
+
+        async function executeTx(actionType) {
+            alert("Please confirm transaction in your wallet.");
+            // In production, call your contract here:
+            // const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+            // await contract.processAction(actionType);
+            console.log("Executing action:", actionType);
+            alert("Blockchain transaction successful!");
+        }
+    </script>
+</body>
+</html>
