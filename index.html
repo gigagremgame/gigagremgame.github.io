@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type="module">
+        import { createAppKit, defaultConfig } from '@reown/appkit'
+        import { polygon } from '@reown/appkit/networks'
+
+        const metadata = { name: 'PepeVolt', description: 'Tap Tap Game', url: 'https://pepevolt.github.io', icons: ['...'] }
+        
+        createAppKit({
+            adapters: [/* your adapters */],
+            networks: [polygon],
+            projectId: 'YOUR_PROJECT_ID',
+            metadata
+        })
+    </script>
+</head>
+<body>
+    <appkit-button></appkit-button> <div id="game-ui">
+        <button onclick="buyEnergy()">Buy 10,000 Energy (100 PVLT)</button>
+        <button onclick="convert()">Convert 100 Diamonds -> 1 gPVLT</button>
+        <button onclick="claim()">Claim Reward</button>
+    </div>
+
+    <script>
+        async function buyEnergy() {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await provider.getSigner();
+            const contract = new ethers.Contract(CONTRACT_ADDR, ABI, signer);
+            const tx = await contract.buyEnergy();
+            await tx.wait(); // Wait for blockchain confirmation
+            alert("Transaction Confirmed on Polygon!");
+        }
+    </script>
+</body>
+</html>
